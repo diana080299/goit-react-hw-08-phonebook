@@ -2,7 +2,7 @@
   "name": "goit-react-hw-07-phonebook",
   "version": "0.1.0",
   "private": true,
-  "homepage": "https://diana080299.github.io/goit-react-hw-07-phonebook/",
+  "homepage": "https://diana080299.github.io/goit-react-hw-08-phonebook/",
   "dependencies": {
     "@chakra-ui/icons": "^2.1.1",
     "@chakra-ui/react": "^2.8.2",
@@ -22,6 +22,7 @@
     "react-loading": "^2.0.3",
     "react-notifications": "^1.7.4",
     "react-redux": "^9.0.4",
+    "react-router-dom": "^6.21.0",
     "react-scripts": "5.0.1",
     "react-spinners": "^0.13.8",
     "redux-logger": "^3.0.6",
