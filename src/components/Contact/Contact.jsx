@@ -1,29 +1,37 @@
-import { useSelector, useDispatch } from 'react-redux';
-import { deleteContact } from '../../store/contacts/operations';
-import { selectVisibleContacts } from '../../store/contacts/selectors';
-import { Button, Box } from '@chakra-ui/react';
+import { Box, Button, Text } from '@chakra-ui/react';
+import { useDispatch } from 'react-redux';
+import { delContactThunk } from 'service/fetchContacts';
 
-export const Contact = () => {
+export const Contact = ({ contact }) => {
+  const { id, name, number } = contact;
   const dispatch = useDispatch();
 
-  const formatNumber = number => {
-    return number.replace(/(\d{3})(\d{2})(\d{2})/, '$1-$2-$3');
+  const deleteContact = contactId => {
+    dispatch(delContactThunk(contactId));
   };
 
-  const filterName = useSelector(selectVisibleContacts);
   return (
-    <Box display="grid" gridGap={2} gridAutoFlow="row dense">
-      {filterName.map((contact, id) => (
-        <Box boxShadow="xl" p="6" rounded="md" bg="white" key={id}>
-          {contact.name}: {formatNumber(contact.phone)}{' '}
-          <Button
-            type="button"
-            onClick={() => dispatch(deleteContact(contact.id))}
-          >
-            Delete
-          </Button>
-        </Box>
-      ))}
+    <Box
+      display="flex"
+      alignItems="baseline"
+      gap="10px"
+      boxShadow="base"
+      p="6"
+      rounded="md"
+      bg="white"
+      margin="12px"
+      maxWidth="fit-content"
+    >
+      <Text as="b">
+        {name}: {number}
+      </Text>
+      <Button
+        colorScheme="teal"
+        variant="outline"
+        onClick={() => deleteContact(id)}
+      >
+        Delete
+      </Button>
     </Box>
   );
 };

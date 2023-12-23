@@ -1,17 +1,21 @@
-import { useDispatch } from 'react-redux';
-import { searchFilter } from '../../store/myFilterSlice';
-import { Box, Input } from '@chakra-ui/react';
+import { useDispatch, useSelector } from 'react-redux';
+
+import { Box, Heading, Input } from '@chakra-ui/react';
+import { filterSet, selectFilter } from 'store/myFilterSlice';
 
 export const Filter = props => {
   const dispatch = useDispatch();
+  const filterName = useSelector(selectFilter);
 
   const handleFilter = event => {
-    const filter = event.currentTarget.value;
-    dispatch(searchFilter(filter));
+    const { value } = event.currentTarget;
+    dispatch(filterSet(value));
   };
   return (
-    <Box>
-      <h1>Find contacts by name</h1>
+    <Box paddingLeft="15px">
+      <Heading as="h4" size="mb" marginBottom="20px">
+        Find contacts by name
+      </Heading>
       <Input
         variant="filled"
         type="text"
@@ -20,6 +24,8 @@ export const Filter = props => {
         pattern="^[a-zA-Zа-яА-Я]+(([' \-][a-zA-Zа-яА-Я ])?[a-zA-Zа-яА-Я]*)*$"
         required
         placeholder="Search your name"
+        value={filterName}
+        maxWidth="320px"
       />
     </Box>
   );

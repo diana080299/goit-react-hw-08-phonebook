@@ -1,29 +1,38 @@
-import { Contact } from 'components/Contact/Contact';
 import { useEffect } from 'react';
-import { useSelector, useDispatch } from 'react-redux';
-import { isLoading } from '../../store/contacts/selectors';
-import { fetchContact } from 'store/contacts/operations';
-import { Box } from '@chakra-ui/react';
-import ClipLoader from 'react-spinners/ClipLoader';
+import * as React from 'react';
+
+import { Contact } from 'components/Contact/Contact';
+import { useDispatch, useSelector } from 'react-redux';
+import { selectPhoneBookValue } from 'store/phoneBook/phoneSelector';
+import { selectFilter } from 'store/myFilterSlice';
+import { getContactsThunk } from 'service/fetchContacts';
+import { Heading } from '@chakra-ui/react';
 
 export const ContactList = () => {
-  const loading = useSelector(isLoading);
   const dispatch = useDispatch();
 
+  const phoneBook = useSelector(selectPhoneBookValue);
+  const filterPhoneBook = useSelector(selectFilter);
+
   useEffect(() => {
-    dispatch(fetchContact());
+    dispatch(getContactsThunk());
   }, [dispatch]);
 
+  const lowerFilter = filterPhoneBook.toLowerCase();
+  const visibleContacts = phoneBook.filter(({ name }) =>
+    name.toLowerCase().includes(lowerFilter)
+  );
+
   return (
-    <Box
-      style={{
-        display: 'flex',
-        justifyContent: 'center',
-        alignItems: 'center',
-      }}
-      bg="brand.100"
-    >
-      {loading ? <ClipLoader size={150} color="#36d7b7" /> : <Contact />}
-    </Box>
+    <div>
+      <Heading as="h3" size="md" margin="20px">
+        Your Contacts
+      </Heading>
+      <>
+        {visibleContacts.map(contact => (
+          <Contact contact={contact} key={contact.id} />
+        ))}
+      </>
+    </div>
   );
 };

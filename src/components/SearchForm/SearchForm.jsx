@@ -1,8 +1,5 @@
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
-import { nanoid } from 'nanoid';
-import { selectContacts } from '../../store/contacts/selectors';
-import { postContacts } from 'store/contacts/operations';
 import {
   FormControl,
   FormLabel,
@@ -10,70 +7,115 @@ import {
   Button,
   InputGroup,
   InputLeftElement,
+  Box,
 } from '@chakra-ui/react';
 import { PhoneIcon } from '@chakra-ui/icons';
 import { FiUser } from 'react-icons/fi';
 
+import {
+  selectIsContactAdd,
+  selectPhoneBookValue,
+} from 'store/phoneBook/phoneSelector';
+import { Notify } from 'notiflix';
+import { postContactThunk } from 'service/fetchContacts';
+
 export const SearchForm = () => {
-  const contacts = useSelector(selectContacts);
+  const [name, setName] = useState('');
+  const [number, setNumber] = useState('');
+  const [add, setAdd] = useState(false);
+
   const dispatch = useDispatch();
+  const phoneBook = useSelector(selectPhoneBookValue);
+  const isContactAdd = useSelector(selectIsContactAdd);
 
-  const handleSubmit = e => {
-    e.preventDefault();
-    const form = e.currentTarget;
-    const name = form.elements.name.value;
-    const phone = form.elements.phone.value;
+  useEffect(() => {
+    if (isContactAdd) {
+      reset();
+    }
+  }, [isContactAdd]);
 
-    const isContactExists = contacts.some(contact => contact.name === name);
+  const onSubmitAddContact = event => {
+    event.preventDefault();
+    const newObj = { name, number };
 
-    if (isContactExists) {
-      alert(`${name} is already in contacts.`);
-    } else {
-      const newContact = {
-        id: nanoid(),
-        name,
-        phone,
-      };
-      dispatch(postContacts(newContact));
-      form.reset();
+    if (isNameNew(phoneBook, newObj) !== undefined) {
+      Notify.warning(`${newObj.name} is already in contacts`);
+      return;
+    }
+    setAdd(true);
+    dispatch(postContactThunk(newObj));
+  };
+
+  const isNameNew = (phoneBook, newObj) => {
+    return phoneBook.find(
+      ({ name }) => name.toLowerCase() === newObj.name.toLowerCase()
+    );
+  };
+
+  const onChangeInput = event => {
+    const { name, value } = event.currentTarget;
+    switch (name) {
+      case 'name':
+        setName(value);
+        break;
+      case 'number':
+        setNumber(value);
+        break;
+
+      default:
+        break;
     }
   };
 
+  const reset = () => {
+    setName('');
+    setNumber('');
+  };
+
   return (
-    <form onSubmit={handleSubmit}>
-      <FormControl>
-        <FormLabel>
-          Name
-          <InputGroup>
-            <InputLeftElement pointerEvents="none">
-              <FiUser color="gray" />
-            </InputLeftElement>
-            <Input
-              variant="flushed"
-              type="text"
-              name="name"
-              required
-              placeholder="Enter your name"
-            />
-          </InputGroup>
-        </FormLabel>
-        <FormLabel>
-          Number
-          <InputGroup>
-            <InputLeftElement pointerEvents="none">
-              <PhoneIcon color="gray.300" />
-            </InputLeftElement>
-            <Input
-              variant="flushed"
-              type="text"
-              name="phone"
-              required
-              placeholder="Enter your number"
-            />
-          </InputGroup>
-        </FormLabel>
-        <Button type="submit">Add contacts</Button>
-      </FormControl>
-    </form>
+    <Box maxWidth="320px" padding="20px">
+      <form onSubmit={onSubmitAddContact}>
+        <FormControl>
+          <FormLabel>
+            Name
+            <InputGroup>
+              <InputLeftElement pointerEvents="none">
+                <FiUser color="gray" />
+              </InputLeftElement>
+              <Input
+                variant="flushed"
+                type="text"
+                name="name"
+                required
+                placeholder="Enter your name"
+                onChange={onChangeInput}
+                value={name}
+              />
+            </InputGroup>
+          </FormLabel>
+          <FormLabel>
+            Number
+            <InputGroup>
+              <InputLeftElement pointerEvents="none">
+                <PhoneIcon color="gray.300" />
+              </InputLeftElement>
+              <Input
+                variant="flushed"
+                type="tel"
+                name="number"
+                required
+                placeholder="Enter your number"
+                onChange={onChangeInput}
+                value={number}
+                marginBottom="20px"
+              />
+            </InputGroup>
+          </FormLabel>
+          <Button type="submit" marginBottom="20px">
+            Add contacts
+          </Button>
+        </FormControl>
+      </form>
+    </Box>
   );
 };
