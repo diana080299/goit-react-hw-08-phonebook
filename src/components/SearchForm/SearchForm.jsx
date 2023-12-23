@@ -22,7 +22,6 @@ import { postContactThunk } from 'service/fetchContacts';
 export const SearchForm = () => {
   const [name, setName] = useState('');
   const [number, setNumber] = useState('');
-  const [add, setAdd] = useState(false);
 
   const dispatch = useDispatch();
   const phoneBook = useSelector(selectPhoneBookValue);
@@ -42,7 +41,7 @@ export const SearchForm = () => {
       Notify.warning(`${newObj.name} is already in contacts`);
       return;
     }
-    setAdd(true);
+
     dispatch(postContactThunk(newObj));
   };
 
